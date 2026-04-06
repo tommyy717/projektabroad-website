@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projekt Abroad — Průmyslový subdodavatel</title>
+  <link rel="icon" href="brand_assets/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            graphite: '#1C2122',
+            cyan: '#1FB6CF',
+            'cyan-d': '#1A9AAF',
+            steel: '#D9D9D9',
+          },
+          fontFamily: { sans: ['Roboto', 'sans-serif'] },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #111111; color: #F7FFFF; font-family: 'Roboto', sans-serif; }
+
+    /* ── Nav ── */
+    .nav-link {
+      color: #D9D9D9;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding-bottom: 3px;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .nav-link:hover { color: #F7FFFF; border-color: #1FB6CF; }
+    .nav-link:focus-visible { outline: 2px solid #1FB6CF; outline-offset: 4px; }
+
+    /* ── Language switcher ── */
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: #666;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      padding: 0.25rem 0.3rem;
+      transition: color 0.2s;
+      font-family: 'Roboto', sans-serif;
+    }
+    .lang-btn:hover { color: #D9D9D9; }
+    .lang-btn.lang-active { color: #1FB6CF; }
+    .lang-btn:focus-visible { outline: 2px solid #1FB6CF; outline-offset: 2px; }
+    .lang-sep { color: #333; font-size: 0.72rem; user-select: none; }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      background: #1FB6CF;
+      color: #111111;
+      font-weight: 700;
+      font-size: 0.8125rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.6875rem 1.875rem;
+      border: 2px solid #1FB6CF;
+      cursor: pointer;
+      display: inline-block;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .btn-primary:hover { background: #1A9AAF; border-color: #1A9AAF; transform: translateY(-2px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:focus-visible { outline: 2px solid #1FB6CF; outline-offset: 3px; }
+
+    .btn-outline {
+      background: transparent;
+      color: #1FB6CF;
+      font-weight: 700;
+      font-size: 0.8125rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.6875rem 1.875rem;
+      border: 2px solid #1FB6CF;
+      cursor: pointer;
+      display: inline-block;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s, transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .btn-outline:hover { background: #1FB6CF; color: #111111; transform: translateY(-2px); }
+    .btn-outline:active { transform: translateY(0); }
+    .btn-outline:focus-visible { outline: 2px solid #1FB6CF; outline-offset: 3px; }
+
+    /* ── Reference carousel ── */
+    #ref-outer {
+      overflow: hidden;
+      cursor: default;
+    }
+    #ref-strip {
+      display: flex;
+      gap: 1.5rem;
+      width: max-content;
+      will-change: transform;
+    }
+    @keyframes ref-ping-pong {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(var(--scroll-end, -900px)); }
+    }
+    #ref-strip.ref-animated {
+      animation: ref-ping-pong 22s ease-in-out infinite alternate;
+    }
+    .ref-card-img {
+      flex-shrink: 0;
+      width: 420px;
+      height: 280px;
+      position: relative;
+      overflow: hidden;
+    }
+    .ref-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .ref-card-img:hover img { transform: scale(1.04); }
+    .ref-card-img .img-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* ── Divider ── */
+    .cyan-line { width: 48px; height: 3px; background: #1FB6CF; display: block; margin-bottom: 1.25rem; }
+
+    /* ── Section ── */
+    .section-light { background: #F5F5F3; color: #111111; }
+    .section-light .sub-label { color: #555; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ NAV ═══════════════════════════════════════ -->
+<nav style="background:#111111; border-bottom:2px solid #1FB6CF; position:sticky; top:0; z-index:50;">
+  <div style="max-width:1200px; margin:0 auto; padding:0.75rem 2rem; display:flex; align-items:center; justify-content:space-between;">
+    <a href="#" style="display:flex; align-items:center; text-decoration:none;">
+      <img src="brand_assets/logo.png" alt="PA Logo" style="height:48px; width:auto;" />
+    </a>
+    <div style="display:flex; align-items:center; gap:2.5rem;">
+      <a href="#o-nas" class="nav-link" data-i18n="nav.about">O nás</a>
+      <a href="#referencie" class="nav-link" data-i18n="nav.refs">Reference</a>
+      <a href="#kontakt" class="nav-link" data-i18n="nav.contact">Kontakt</a>
+      <!-- Language switcher -->
+      <div style="display:flex; align-items:center; gap:0; border-left:1px solid #333; padding-left:1.5rem;">
+        <button class="lang-btn lang-active" id="lang-cs" onclick="setLang('cs')" aria-label="Čeština">CZ</button>
+        <span class="lang-sep">|</span>
+        <button class="lang-btn" id="lang-en" onclick="setLang('en')" aria-label="English">EN</button>
+        <span class="lang-sep">|</span>
+        <button class="lang-btn" id="lang-de" onclick="setLang('de')" aria-label="Deutsch">DE</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════ HERO ═══════════════════════════════════════ -->
+<section style="background: linear-gradient(160deg, #1C2122 0%, #111111 60%); padding:5rem 2rem 4rem;">
+  <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center;">
+
+    <!-- Left: headline + stats -->
+    <div>
+      <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:#1FB6CF; margin-bottom:1rem;" data-i18n="hero.subtitle">Průmyslový subdodavatel · Evropa</p>
+
+      <h1 style="font-size:clamp(2rem,4vw,3rem); font-weight:900; line-height:1.15; letter-spacing:-0.03em; color:#F7FFFF; margin-bottom:0.4rem;" data-i18n="hero.h1">
+        Profesionalita&nbsp;•&nbsp;Důvěra
+      </h1>
+      <h2 style="font-size:clamp(2rem,4vw,3rem); font-weight:900; line-height:1.15; letter-spacing:-0.03em; color:#1FB6CF; margin-bottom:2.75rem;" data-i18n="hero.h2">
+        Spolehlivost&nbsp;•&nbsp;Partnerství
+      </h2>
+
+      <!-- Stats grid -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem 2rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:2rem; margin-bottom:2.5rem;">
+        <div>
+          <div style="font-size:2.5rem; font-weight:900; color:#1FB6CF; line-height:1; letter-spacing:-0.03em;">5</div>
+          <div style="font-size:0.7rem; color:#D9D9D9; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.3rem;" data-i18n="hero.stat.years">Let zkušeností</div>
+        </div>
+        <div>
+          <div style="font-size:2.5rem; font-weight:900; color:#1FB6CF; line-height:1; letter-spacing:-0.03em;">6+</div>
+          <div style="font-size:0.7rem; color:#D9D9D9; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.3rem;" data-i18n="hero.stat.countries">Zemí působení</div>
+        </div>
+        <div>
+          <div style="font-size:2.5rem; font-weight:900; color:#1FB6CF; line-height:1; letter-spacing:-0.03em;">170+</div>
+          <div style="font-size:0.7rem; color:#D9D9D9; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.3rem;" data-i18n="hero.stat.workers">Vyslaných pracovníků</div>
+        </div>
+        <div>
+          <div style="font-size:2.5rem; font-weight:900; color:#1FB6CF; line-height:1; letter-spacing:-0.03em;">78</div>
+          <div style="font-size:0.7rem; color:#D9D9D9; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.3rem;" data-i18n="hero.stat.projects">Projektů, na nichž jsme se podíleli</div>
+        </div>
+      </div>
+
+      <p style="color:#D9D9D9; line-height:1.75; font-size:0.9375rem; max-width:480px;" data-i18n="hero.text">
+        Projekt Abroad je spolehlivý partner pro průmyslové subdodávky napříč celou Evropou. Zajišťujeme montáž, instalaci a údržbu technologických zařízení pro přední firmy v potravinářském, chemickém, energetickém a farmaceutickém odvětví.
+      </p>
+    </div>
+
+    <!-- Right: Europe SVG map -->
+    <div style="position:relative; display:flex; justify-content:center; align-items:center;">
+      <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:500px; filter:drop-shadow(0 8px 32px rgba(31,182,207,0.15));">
+        <rect width="320" height="280" fill="#1C2122" rx="4"/>
+
+        <!-- UK island -->
+        <polygon points="68,128 60,118 55,102 60,88 72,80 80,85 78,96 70,108 72,122"
+          fill="#232E30" stroke="#1FB6CF" stroke-width="1" stroke-opacity="0.6"/>
+        <!-- Ireland -->
+        <polygon points="50,110 44,104 44,94 52,89 56,98 54,108"
+          fill="#232E30" stroke="#1FB6CF" stroke-width="0.8" stroke-opacity="0.5"/>
+
+        <!-- Continental Europe -->
+        <polygon points="
+            80,212 76,174 92,168 100,160 96,148 82,140 74,130 80,120
+            96,113 104,103 104,89 108,76 106,62 114,56 112,44
+            125,36 140,28 160,22 185,28 198,48 192,72 182,80
+            180,94 176,104 178,114 174,124 170,130 172,140
+            178,148 195,150 205,158 215,154 226,162 235,158
+            246,168 248,182 238,196 232,210 228,222 218,232
+            212,224 205,218 210,232 206,248 198,255 190,240
+            182,226 174,218 162,215 155,222 148,218 138,214
+            128,216 120,225 114,238 106,242 100,236 92,228 86,220 80,212"
+          fill="#1E2B2D" stroke="#1FB6CF" stroke-width="1.2"/>
+
+        <!-- ── Location dots ── -->
+
+        <!-- Sweden -->
+        <circle cx="163" cy="62" r="3.5" fill="#1FB6CF"/>
+        <circle cx="163" cy="62" r="7" fill="none" stroke="#1FB6CF" stroke-width="1" opacity="0.4">
+          <animate attributeName="r" from="5" to="12" dur="3.6s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" from="0.5" to="0" dur="3.6s" repeatCount="indefinite"/>
+        </circle>
+        <text x="170" y="59" fill="#F7FFFF" font-size="7" font-family="Roboto,sans-serif" data-i18n="map.se">Švédsko</text>
+
+        <!-- Belgium -->
+        <circle cx="115" cy="114" r="3.5" fill="#1FB6CF"/>
+        <circle cx="115" cy="114" r="7" fill="none" stroke="#1FB6CF" stroke-width="1" opacity="0.4">
+          <animate attributeName="r" from="5" to="12" dur="2.4s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" from="0.5" to="0" dur="2.4s" repeatCount="indefinite"/>
+        </circle>
+        <text x="122" y="111" fill="#F7FFFF" font-size="7" font-family="Roboto,sans-serif" data-i18n="map.be">Belgie</text>
+
+        <!-- Germany -->
+        <circle cx="148" cy="120" r="3.5" fill="#1FB6CF"/>
+        <circle cx="148" cy="120" r="7" fill="none" stroke="#1FB6CF" stroke-width="1" opacity="0.4">
+          <animate attributeName="r" from="5" to="12" dur="2.8s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" from="0.5" to="0" dur="2.8s" repeatCount="indefinite"/>
+        </circle>
+        <text x="155" y="117" fill="#F7FFFF" font-size="7" font-family="Roboto,sans-serif" data-i18n="map.de">Německo</text>
+
+        <!-- Czech Republic (HQ) -->
+        <circle cx="172" cy="132" r="4.5" fill="#1FB6CF"/>
+        <circle cx="172" cy="132" r="9" fill="none" stroke="#1FB6CF" stroke-width="1.2" opacity="0.5">
+          <animate attributeName="r" from="7" to="16" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" from="0.6" to="0" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <text x="179" y="129" fill="#F7FFFF" font-size="7" font-family="Roboto,sans-serif" font-weight="700" data-i18n="map.cz">Česko</text>
+
+        <!-- Austria -->
+        <circle cx="163" cy="148" r="3.5" fill="#1FB6CF"/>
+        <circle cx="163" cy="148" r="7" fill="none" stroke="#1FB6CF" stroke-width="1" opacity="0.4">
+          <animate attributeName="r" from="5" to="12" dur="3s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" from="0.5" to="0" dur="3s" repeatCount="indefinite"/>
+        </circle>
+        <text x="170" y="145" fill="#F7FFFF" font-size="7" font-family="Roboto,sans-serif" data-i18n="map.at">Rakousko</text>
+
+        <!-- Slovenia -->
+        <circle cx="167" cy="161" r="3.5" fill="#1FB6CF"/>
+        <circle cx="167" cy="161" r="7" fill="none" stroke="#1FB6CF" stroke-width="1" opacity="0.4">
+          <animate attributeName="r" from="5" to="12" dur="3.4s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" from="0.5" to="0" dur="3.4s" repeatCount="indefinite"/>
+        </circle>
+        <text x="174" y="158" fill="#F7FFFF" font-size="7" font-family="Roboto,sans-serif" data-i18n="map.si">Slovinsko</text>
+
+        <!-- Grid lines (subtle) -->
+        <line x1="0" y1="70" x2="320" y2="70" stroke="#1FB6CF" stroke-width="0.2" stroke-opacity="0.2"/>
+        <line x1="0" y1="140" x2="320" y2="140" stroke="#1FB6CF" stroke-width="0.2" stroke-opacity="0.2"/>
+        <line x1="0" y1="210" x2="320" y2="210" stroke="#1FB6CF" stroke-width="0.2" stroke-opacity="0.2"/>
+        <line x1="80" y1="0" x2="80" y2="280" stroke="#1FB6CF" stroke-width="0.2" stroke-opacity="0.2"/>
+        <line x1="160" y1="0" x2="160" y2="280" stroke="#1FB6CF" stroke-width="0.2" stroke-opacity="0.2"/>
+        <line x1="240" y1="0" x2="240" y2="280" stroke="#1FB6CF" stroke-width="0.2" stroke-opacity="0.2"/>
+      </svg>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════ INDUSTRY SECTORS ══════════════════════════ -->
+<div style="background:#111111; border-top:1px solid rgba(255,255,255,0.06); border-bottom:1px solid rgba(255,255,255,0.06); padding:2rem 2rem;">
+  <div style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-around; align-items:center; flex-wrap:wrap; gap:1.5rem;">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+      <img src="brand_assets/1food_blue.svg" alt="Food" style="width:36px; height:36px;" />
+      <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:#D9D9D9;" data-i18n="sector.food">Potravinářství</span>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+      <img src="brand_assets/2pharmacy_blue.svg" alt="Pharmacy" style="width:36px; height:36px;" />
+      <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:#D9D9D9;" data-i18n="sector.pharma">Farmacie</span>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+      <img src="brand_assets/3energetic_blue.svg" alt="Energy" style="width:36px; height:36px;" />
+      <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:#D9D9D9;" data-i18n="sector.energy">Energetika</span>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+      <img src="brand_assets/4chemistry_blue.svg" alt="Chemistry" style="width:36px; height:36px;" />
+      <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:#D9D9D9;" data-i18n="sector.chem">Chemie</span>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+      <img src="brand_assets/5power-plant_blue.svg" alt="Power Plant" style="width:36px; height:36px;" />
+      <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:#D9D9D9;" data-i18n="sector.power">Elektrárny</span>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+      <img src="brand_assets/6plumbing_blue.svg" alt="Plumbing" style="width:36px; height:36px;" />
+      <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:#D9D9D9;" data-i18n="sector.plumbing">Instalace</span>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+      <img src="brand_assets/7bridges_blue.svg" alt="Bridges" style="width:36px; height:36px;" />
+      <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:#D9D9D9;" data-i18n="sector.bridges">Mosty</span>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+      <img src="brand_assets/8winch_blue.svg" alt="Cranes" style="width:36px; height:36px;" />
+      <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:#D9D9D9;" data-i18n="sector.cranes">Ostatní</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════ O NÁS ════════════════════════════ -->
+<section id="o-nas" class="section-light" style="padding:5rem 2rem;">
+  <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:start;">
+
+    <div>
+      <span class="cyan-line"></span>
+      <h2 style="font-size:2.25rem; font-weight:900; letter-spacing:-0.03em; color:#111111; margin-bottom:1.5rem;" data-i18n="about.heading">O nás</h2>
+      <p style="color:#333; line-height:1.75; font-size:0.9375rem; margin-bottom:1rem;" data-i18n="about.p1">
+        Společnost Projekt Abroad s.r.o. se zaměřením na poskytování vysoce kvalifikované pracovní síly pro průmyslové projekty v celé Evropě. Naší silnou stránkou je dlouholetá spolupráce s ověřenými partnery v Belgii, Německu, Rakousku, Slovinsku, Švédsku a dalších zemích.
+      </p>
+      <p style="color:#333; line-height:1.75; font-size:0.9375rem; margin-bottom:1rem;" data-i18n="about.p2">
+        Zajišťujeme komplexní řešení v oblasti montáže technologických zařízení, potrubních systémů, svářečských prací a stavebně-montážních činností. Naši pracovníci jsou plně certifikováni a pravidelně školeni podle evropských norem.
+      </p>
+      <p style="color:#333; line-height:1.75; font-size:0.9375rem; margin-bottom:1rem;" data-i18n="about.p3">
+        Klademe důraz na bezpečnost, kvalitu a dodržování termínů. Ke každému projektu přistupujeme individuálně a s plnou profesionalitou — od prvního kontaktu až po úspěšné předání.
+      </p>
+      <!-- Quality badge -->
+      <div style="background:#1C2122; border-left:3px solid #1FB6CF; padding:1rem 1.25rem; margin-bottom:2.5rem; display:flex; align-items:flex-start; gap:1rem;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="flex-shrink:0; margin-top:2px;" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L14.4 8.26L21 9.27L16.5 13.64L17.76 20.22L12 17.27L6.24 20.22L7.5 13.64L3 9.27L9.6 8.26L12 2Z" stroke="#1FB6CF" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+          <path d="M9 12l2 2 4-4" stroke="#1FB6CF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <p style="font-size:0.8125rem; font-weight:700; color:#F7FFFF; letter-spacing:0.04em; text-transform:uppercase; margin-bottom:0.35rem;" data-i18n="about.quality.title">Ověřená kvalita před každým projektem</p>
+          <p style="font-size:0.8125rem; color:#A0ADB0; line-height:1.65;" data-i18n="about.quality.text">Díky spolupráci s partnerskou svářecí školou každý nový pracovník prochází praktickým přezkoušením ještě před nástupem na projekt. Nezáleží nám jen na certifikátech — ověřujeme dovednosti na vlastní oči, aby výsledek vždy odpovídal standardu, na kterém si zakládáme.</p>
+        </div>
+      </div>
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <a href="#kontakt" class="btn-primary" data-i18n="about.btn.contact">Kontaktovat</a>
+        <a href="#referencie" class="btn-outline" data-i18n="nav.refs">Reference</a>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+      <div style="position:relative; overflow:hidden; height:420px;">
+        <img src="website_pics/1img.jpg" alt="Svářeč při práci" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.35), transparent);"></div>
+      </div>
+      <div style="position:relative; overflow:hidden; height:420px;">
+        <img src="website_pics/2img.jpg" alt="Potrubní systém" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.35), transparent);"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════ CO NABÍZÍME ════════════════════════════ -->
+<section style="background:#111111; padding:5rem 2rem;">
+  <div style="max-width:1200px; margin:0 auto;">
+    <span class="cyan-line"></span>
+    <h2 style="font-size:2.25rem; font-weight:900; letter-spacing:-0.03em; color:#F7FFFF; margin-bottom:0.75rem;" data-i18n="services.heading">Co nabízíme</h2>
+    <p style="color:#A0ADB0; font-size:0.9375rem; line-height:1.7; max-width:620px; margin-bottom:3rem;" data-i18n="services.sub">Dodáváme odborníky s prokazatelnými zkušenostmi a platnou certifikací. Každý pracovník je před nasazením na projekt osobně přezkoušen.</p>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem;">
+
+      <!-- Potrubáři -->
+      <div style="background:#1C2122; padding:2rem; border-top:3px solid #1FB6CF; transition:transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s cubic-bezier(0.4,0,0.2,1);" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 12px 36px rgba(0,0,0,0.3),0 4px 10px rgba(31,182,207,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="width:52px; height:52px; background:rgba(31,182,207,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:1.25rem;">
+          <img src="brand_assets/svgviewer-output_blue.svg" alt="Potrubáři" style="width:28px; height:28px;" />
+        </div>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#F7FFFF; margin-bottom:0.75rem; letter-spacing:-0.01em;" data-i18n="services.pipe.title">Profesionální potrubářské práce</h3>
+        <p style="font-size:0.875rem; color:#A0ADB0; line-height:1.7;" data-i18n="services.pipe.text">Realizované vyškolenými a zkušenými potrubáři a zámečníky, kteří umí číst izometrické výkresy a veškerou potřebnou dokumentaci.</p>
+      </div>
+
+      <!-- Svářeči -->
+      <div style="background:#1C2122; padding:2rem; border-top:3px solid #1FB6CF; transition:transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s cubic-bezier(0.4,0,0.2,1);" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 12px 36px rgba(0,0,0,0.3),0 4px 10px rgba(31,182,207,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="width:52px; height:52px; background:rgba(31,182,207,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:1.25rem;">
+          <img src="brand_assets/welder_blue.svg" alt="Svářeči" style="width:28px; height:28px;" />
+        </div>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#F7FFFF; margin-bottom:0.75rem; letter-spacing:-0.01em;" data-i18n="services.weld.title">Komplexní svářečské práce</h3>
+        <p style="font-size:0.875rem; color:#A0ADB0; line-height:1.7;" data-i18n="services.weld.text">Provádějí je kvalifikovaní svářeči různými metodami včetně orbitálního svařování. Vše dle norem EN a ISO — s doloženou kvalifikací.</p>
+      </div>
+
+      <!-- Montáž -->
+      <div style="background:#1C2122; padding:2rem; border-top:3px solid #1FB6CF; transition:transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s cubic-bezier(0.4,0,0.2,1);" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 12px 36px rgba(0,0,0,0.3),0 4px 10px rgba(31,182,207,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="width:52px; height:52px; background:rgba(31,182,207,0.1); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:1.25rem;">
+          <img src="brand_assets/system-assembly_blue.svg" alt="Montáž" style="width:28px; height:28px;" />
+        </div>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#F7FFFF; margin-bottom:0.75rem; letter-spacing:-0.01em;" data-i18n="services.assembly.title">Montážní práce</h3>
+        <p style="font-size:0.875rem; color:#A0ADB0; line-height:1.7;" data-i18n="services.assembly.text">Kompletní montáž průmyslových zařízení, ocelových konstrukcí a technologických celků. Pracujeme přesně dle projektové dokumentace a dbáme na každý detail — od přípravy až po finální zprovoznění.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ PROJEKTY ════════════════════════════ -->
+<section style="background:#F5F5F3; padding:5rem 2rem;">
+  <div style="max-width:1200px; margin:0 auto;">
+    <span class="cyan-line"></span>
+    <h2 style="font-size:2.25rem; font-weight:900; letter-spacing:-0.03em; color:#111111; margin-bottom:0.75rem;" data-i18n="projects.heading">Projekty, na kterých jsme se podíleli</h2>
+    <p style="color:#555; font-size:0.9375rem; line-height:1.7; max-width:620px; margin-bottom:3rem;" data-i18n="projects.sub">V průběhu let byly naše týmy součástí průmyslových projektů realizovaných pro etablované společnosti napříč Evropou. Níže uvádíme vybrané z nich.</p>
+
+    <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:1.5rem;">
+
+      <!-- Bosch -->
+      <div style="position:relative; overflow:hidden; height:220px; cursor:default;" onmouseover="this.querySelector('img').style.transform='scale(1.05)'" onmouseout="this.querySelector('img').style.transform='scale(1)'">
+        <img src="website_pics/ref/1ref.jpeg" alt="Robert Bosch" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 55%, transparent 100%);"></div>
+        <div style="position:absolute; bottom:0; left:0; right:0; padding:1.5rem;">
+          <p style="font-size:0.65rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#1FB6CF; margin-bottom:0.3rem;">Reutlingen, Německo</p>
+          <h3 style="font-size:1.25rem; font-weight:900; color:#F7FFFF; letter-spacing:-0.02em;">Robert Bosch GmbH</h3>
+        </div>
+      </div>
+
+      <!-- VDM Metals -->
+      <div style="position:relative; overflow:hidden; height:220px; cursor:default;" onmouseover="this.querySelector('img').style.transform='scale(1.05)'" onmouseout="this.querySelector('img').style.transform='scale(1)'">
+        <img src="website_pics/ref/2ref.jpg" alt="VDM Metals" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 55%, transparent 100%);"></div>
+        <div style="position:absolute; bottom:0; left:0; right:0; padding:1.5rem;">
+          <p style="font-size:0.65rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#1FB6CF; margin-bottom:0.3rem;">Unna, Německo</p>
+          <h3 style="font-size:1.25rem; font-weight:900; color:#F7FFFF; letter-spacing:-0.02em;">VDM Metals GmbH</h3>
+        </div>
+      </div>
+
+      <!-- Energietechnik Essen -->
+      <div style="position:relative; overflow:hidden; height:220px; cursor:default;" onmouseover="this.querySelector('img').style.transform='scale(1.05)'" onmouseout="this.querySelector('img').style.transform='scale(1)'">
+        <img src="website_pics/ref/3ref.png" alt="Energietechnik Essen" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 55%, transparent 100%);"></div>
+        <div style="position:absolute; bottom:0; left:0; right:0; padding:1.5rem;">
+          <p style="font-size:0.65rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#1FB6CF; margin-bottom:0.3rem;">Essen, Německo</p>
+          <h3 style="font-size:1.25rem; font-weight:900; color:#F7FFFF; letter-spacing:-0.02em;">Energietechnik Essen GmbH</h3>
+        </div>
+      </div>
+
+      <!-- SPIE Wiegel -->
+      <div style="position:relative; overflow:hidden; height:220px; cursor:default;" onmouseover="this.querySelector('img').style.transform='scale(1.05)'" onmouseout="this.querySelector('img').style.transform='scale(1)'">
+        <img src="website_pics/ref/4ref.png" alt="SPIE Wiegel" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 55%, transparent 100%);"></div>
+        <div style="position:absolute; bottom:0; left:0; right:0; padding:1.5rem;">
+          <p style="font-size:0.65rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#1FB6CF; margin-bottom:0.3rem;">Kulmbach, Německo</p>
+          <h3 style="font-size:1.25rem; font-weight:900; color:#F7FFFF; letter-spacing:-0.02em;">SPIE Wiegel GmbH</h3>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ REFERENCE (carousel) ════════════════════════════ -->
+<section id="referencie" style="background:#111111; padding:4rem 0;">
+
+  <!-- Carousel outer (clips overflow) -->
+  <div id="ref-outer">
+    <div id="ref-strip">
+
+      <div class="ref-card-img">
+        <img src="website_pics/90dd8d08-79df-46fb-8fa1-a7e6c424d021.JPG" alt="Projekt 1" />
+        <div class="img-overlay"></div>
+      </div>
+
+      <div class="ref-card-img">
+        <img src="website_pics/c0c63b1f-1777-49c5-bb16-9c33f0b6a777.JPG" alt="Projekt 2" />
+        <div class="img-overlay"></div>
+      </div>
+
+      <div class="ref-card-img">
+        <img src="website_pics/IMG_1295.JPG" alt="Projekt 3" />
+        <div class="img-overlay"></div>
+      </div>
+
+      <div class="ref-card-img">
+        <img src="website_pics/IMG_7599.JPG" alt="Projekt 4" />
+        <div class="img-overlay"></div>
+      </div>
+
+      <div class="ref-card-img">
+        <img src="website_pics/IMG_7788.jpg" alt="Projekt 5" />
+        <div class="img-overlay"></div>
+      </div>
+
+      <div class="ref-card-img">
+        <img src="website_pics/IMG_7789.jpg" alt="Projekt 6" />
+        <div class="img-overlay"></div>
+      </div>
+
+      <div class="ref-card-img">
+        <img src="website_pics/IMG_8060.JPG" alt="Projekt 7" />
+        <div class="img-overlay"></div>
+      </div>
+
+      <div class="ref-card-img">
+        <img src="website_pics/IMG_8062.JPG" alt="Projekt 8" />
+        <div class="img-overlay"></div>
+      </div>
+
+
+      <div class="ref-card-img">
+        <img src="website_pics/new1.jpg" alt="Projekt new1" />
+        <div class="img-overlay"></div>
+      </div>
+
+      <div class="ref-card-img">
+        <img src="website_pics/New2.jpg" alt="Projekt new2" />
+        <div class="img-overlay"></div>
+      </div>
+
+      <div class="ref-card-img">
+        <img src="website_pics/New3.jpg" alt="Projekt new3" />
+        <div class="img-overlay"></div>
+      </div>
+
+      <div class="ref-card-img">
+        <img src="website_pics/IMG_8331.JPG" alt="Projekt 10" />
+        <div class="img-overlay"></div>
+      </div>
+
+      <div class="ref-card-img">
+        <img src="website_pics/IMG_9087.JPG" alt="Projekt 11" />
+        <div class="img-overlay"></div>
+      </div>
+
+      <div class="ref-card-img">
+        <img src="website_pics/PHOTO-2026-03-31-11-12-17.jpg" alt="Projekt 12" />
+        <div class="img-overlay"></div>
+      </div>
+
+
+      <div class="ref-card-img">
+        <img src="website_pics/PHOTO-2026-03-31-11-12-172.jpg" alt="Projekt 14" />
+        <div class="img-overlay"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ FOOTER ════════════════════════════ -->
+<footer id="kontakt" style="background:#0D0F10; border-top:2px solid #1FB6CF; padding:4rem 2rem 2rem;">
+  <div style="max-width:1200px; margin:0 auto;">
+
+    <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:3rem; margin-bottom:3rem;">
+
+      <!-- Brand col -->
+      <div>
+        <img src="brand_assets/logo.png" alt="PA Logo" style="height:60px; width:auto; margin-bottom:1.25rem;" />
+        <p style="font-size:0.875rem; color:#D9D9D9; line-height:1.7; max-width:280px;">
+          Projekt Abroad s.r.o.
+        </p>
+      </div>
+
+      <!-- Navigation -->
+      <div>
+        <h4 style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.14em; color:#1FB6CF; font-weight:700; margin-bottom:1rem;" data-i18n="footer.nav.heading">Navigace</h4>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:0.6rem;">
+          <li><a href="#o-nas" style="font-size:0.875rem; color:#D9D9D9; text-decoration:none; transition:color 0.18s;" onmouseover="this.style.color='#1FB6CF'" onmouseout="this.style.color='#D9D9D9'" data-i18n="nav.about">O nás</a></li>
+          <li><a href="#referencie" style="font-size:0.875rem; color:#D9D9D9; text-decoration:none; transition:color 0.18s;" onmouseover="this.style.color='#1FB6CF'" onmouseout="this.style.color='#D9D9D9'" data-i18n="nav.refs">Reference</a></li>
+          <li><a href="#kontakt" style="font-size:0.875rem; color:#D9D9D9; text-decoration:none; transition:color 0.18s;" onmouseover="this.style.color='#1FB6CF'" onmouseout="this.style.color='#D9D9D9'" data-i18n="nav.contact">Kontakt</a></li>
+        </ul>
+      </div>
+
+      <!-- Kontakt -->
+      <div>
+        <h4 style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.14em; color:#1FB6CF; font-weight:700; margin-bottom:1rem;" data-i18n="footer.contact.heading">Kontakt</h4>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:0.6rem;">
+          <li style="font-size:0.875rem; color:#D9D9D9; line-height:1.5;">
+            Rybná 716/24, Staré Město<br>110 00 Praha 1<br>Česká republika
+          </li>
+          <li>
+            <a href="tel:+420778608031" style="font-size:0.875rem; color:#D9D9D9; text-decoration:none; transition:color 0.18s;" onmouseover="this.style.color='#1FB6CF'" onmouseout="this.style.color='#D9D9D9'">+420 778 608 031</a>
+          </li>
+          <li>
+            <a href="mailto:info@projektabroad.com" style="font-size:0.875rem; color:#D9D9D9; text-decoration:none; transition:color 0.18s;" onmouseover="this.style.color='#1FB6CF'" onmouseout="this.style.color='#D9D9D9'">info@projektabroad.com</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Sektory -->
+      <div>
+        <h4 style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.14em; color:#1FB6CF; font-weight:700; margin-bottom:1rem;" data-i18n="footer.sectors.heading">Sektory</h4>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:0.5rem;">
+          <li style="font-size:0.875rem; color:#D9D9D9;" data-i18n="sector.food">Potravinářství</li>
+          <li style="font-size:0.875rem; color:#D9D9D9;" data-i18n="sector.pharma">Farmacie</li>
+          <li style="font-size:0.875rem; color:#D9D9D9;" data-i18n="sector.energy">Energetika</li>
+          <li style="font-size:0.875rem; color:#D9D9D9;" data-i18n="sector.chem">Chemie</li>
+          <li style="font-size:0.875rem; color:#D9D9D9;" data-i18n="sector.power">Elektrárny</li>
+          <li style="font-size:0.875rem; color:#D9D9D9;" data-i18n="sector.plumbing">Instalace</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Bottom bar -->
+    <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+      <p style="font-size:0.75rem; color:#666;" data-i18n="footer.copyright">© 2024 Projekt Abroad s.r.o. Všechna práva vyhrazena.</p>
+      <div style="display:flex; gap:1.5rem;">
+        <a href="#" style="font-size:0.75rem; color:#666; text-decoration:none; transition:color 0.18s;" onmouseover="this.style.color='#1FB6CF'" onmouseout="this.style.color='#666'" data-i18n="footer.privacy">Ochrana osobních údajů</a>
+        <a href="#" style="font-size:0.75rem; color:#666; text-decoration:none; transition:color 0.18s;" onmouseover="this.style.color='#1FB6CF'" onmouseout="this.style.color='#666'" data-i18n="footer.terms">Podmínky použití</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════ i18n + carousel ═══════════════════════════════════════ -->
+<script>
+  const translations = {
+    cs: {
+      'nav.about': 'O nás',
+      'nav.refs': 'Reference',
+      'nav.contact': 'Kontakt',
+      'hero.subtitle': 'Průmyslový subdodavatel · Evropa',
+      'hero.h1': 'Profesionalita&nbsp;•&nbsp;Důvěra',
+      'hero.h2': 'Spolehlivost&nbsp;•&nbsp;Partnerství',
+      'hero.stat.years': 'Let zkušeností',
+      'hero.stat.countries': 'Zemí působení',
+      'hero.stat.workers': 'Vyslaných pracovníků',
+      'hero.stat.projects': 'Projektů, na nichž jsme se podíleli',
+      'hero.text': 'Projekt Abroad je spolehlivý partner pro průmyslové subdodávky napříč celou Evropou. Zajišťujeme montáž, instalaci a údržbu technologických zařízení pro přední firmy v potravinářském, chemickém, energetickém a farmaceutickém odvětví.',
+      'sector.food': 'Potravinářství',
+      'sector.pharma': 'Farmacie',
+      'sector.energy': 'Energetika',
+      'sector.chem': 'Chemie',
+      'sector.power': 'Elektrárny',
+      'sector.plumbing': 'Instalace',
+      'sector.bridges': 'Mosty',
+      'sector.cranes': 'Ostatní',
+      'about.heading': 'O nás',
+      'about.p1': 'Společnost Projekt Abroad s.r.o. se zaměřením na poskytování vysoce kvalifikované pracovní síly pro průmyslové projekty v celé Evropě. Naší silnou stránkou je dlouholetá spolupráce s ověřenými partnery v Belgii, Německu, Rakousku, Slovinsku, Švédsku a dalších zemích.',
+      'about.p2': 'Zajišťujeme komplexní řešení v oblasti montáže technologických zařízení, potrubních systémů, svářečských prací a stavebně-montážních činností. Naši pracovníci jsou plně certifikováni a pravidelně školeni podle evropských norem.',
+      'about.p3': 'Klademe důraz na bezpečnost, kvalitu a dodržování termínů. Ke každému projektu přistupujeme individuálně a s plnou profesionalitou — od prvního kontaktu až po úspěšné předání.',
+      'about.btn.contact': 'Kontaktovat',
+      'about.quality.title': 'Ověřená kvalita před každým projektem',
+      'about.quality.text': 'Díky spolupráci s partnerskou svářecí školou každý nový pracovník prochází praktickým přezkoušením ještě před nástupem na projekt. Nezáleží nám jen na certifikátech — ověřujeme dovednosti na vlastní oči, aby výsledek vždy odpovídal standardu, na kterém si zakládáme.',
+      'services.heading': 'Co nabízíme',
+      'services.sub': 'Dodáváme odborníky s prokazatelnými zkušenostmi a platnou certifikací. Každý pracovník je před nasazením na projekt osobně přezkoušen.',
+      'services.pipe.title': 'Profesionální potrubářské práce',
+      'services.pipe.text': 'Realizované vyškolenými a zkušenými potrubáři a zámečníky, kteří umí číst izometrické výkresy a veškerou potřebnou dokumentaci.',
+      'services.weld.title': 'Komplexní svářečské práce',
+      'services.weld.text': 'Provádějí je kvalifikovaní svářeči různými metodami včetně orbitálního svařování. Vše dle norem EN a ISO — s doloženou kvalifikací.',
+      'services.assembly.title': 'Montážní práce',
+      'services.assembly.text': 'Kompletní montáž průmyslových zařízení, ocelových konstrukcí a technologických celků. Pracujeme přesně dle projektové dokumentace a dbáme na každý detail — od přípravy až po finální zprovoznění.',
+      'projects.heading': 'Projekty, na kterých jsme se podíleli',
+      'projects.sub': 'V průběhu let byly naše týmy součástí průmyslových projektů realizovaných pro etablované společnosti napříč Evropou. Níže uvádíme vybrané z nich.',
+      'refs.heading': 'Reference',
+      'footer.tagline': 'Projekt Abroad s.r.o. — spolehlivý partner pro průmyslové subdodávky napříč celou Evropou od roku 2010.',
+      'footer.nav.heading': 'Navigace',
+      'footer.contact.heading': 'Kontakt',
+      'footer.sectors.heading': 'Sektory',
+      'footer.copyright': '© 2024 Projekt Abroad s.r.o. Všechna práva vyhrazena.',
+      'footer.privacy': 'Ochrana osobních údajů',
+      'footer.terms': 'Podmínky použití',
+      'map.se': 'Švédsko',
+      'map.be': 'Belgie',
+      'map.de': 'Německo',
+      'map.cz': 'Česko',
+      'map.at': 'Rakousko',
+      'map.si': 'Slovinsko',
+    },
+    en: {
+      'nav.about': 'About Us',
+      'nav.refs': 'References',
+      'nav.contact': 'Contact',
+      'hero.subtitle': 'Industrial Subcontractor · Europe',
+      'hero.h1': 'Professionalism&nbsp;•&nbsp;Trust',
+      'hero.h2': 'Reliability&nbsp;•&nbsp;Partnership',
+      'hero.stat.years': 'Years of Experience',
+      'hero.stat.countries': 'Countries Active',
+      'hero.stat.workers': 'Deployed Workers',
+      'hero.stat.projects': 'Projects we contributed to',
+      'hero.text': 'Projekt Abroad is a reliable partner for industrial subcontracting across Europe. We provide assembly, installation, and maintenance of technological equipment for leading companies in the food, chemical, energy, and pharmaceutical industries.',
+      'sector.food': 'Food Industry',
+      'sector.pharma': 'Pharmacy',
+      'sector.energy': 'Energy',
+      'sector.chem': 'Chemistry',
+      'sector.power': 'Power Plants',
+      'sector.plumbing': 'Installations',
+      'sector.bridges': 'Bridges',
+      'sector.cranes': 'Other',
+      'about.heading': 'About Us',
+      'about.p1': 'Projekt Abroad s.r.o. focuses on providing highly qualified labor for industrial projects across Europe. Our strength lies in long-standing partnerships with proven partners in Belgium, Germany, Austria, Slovenia, Sweden, and other countries.',
+      'about.p2': 'We provide complete solutions in the field of assembly of technological equipment, piping systems, welding work, and construction-assembly activities. Our workers are fully certified and regularly trained according to European standards.',
+      'about.p3': 'We place great emphasis on safety, quality, and meeting deadlines. We approach every project individually and with full professionalism — from the first contact to successful delivery.',
+      'about.btn.contact': 'Contact Us',
+      'about.quality.title': 'Verified quality before every project',
+      'about.quality.text': 'Thanks to our partnership with a welding school, every new worker undergoes a practical skills test before starting on a project. We don\'t just rely on certificates — we verify competence with our own eyes, so the result always meets the standard we stand by.',
+      'services.heading': 'What we offer',
+      'services.sub': 'We supply specialists with verifiable experience and valid certifications. Every worker is personally tested before being deployed on a project.',
+      'services.pipe.title': 'Professional pipework',
+      'services.pipe.text': 'Carried out by trained and experienced pipefitters and fitters who can read isometric drawings and all required documentation.',
+      'services.weld.title': 'Comprehensive welding',
+      'services.weld.text': 'Performed by qualified welders using various methods including orbital welding. All work is done according to EN and ISO standards — with documented qualifications.',
+      'services.assembly.title': 'Assembly work',
+      'services.assembly.text': 'Complete assembly of industrial equipment, steel structures and technological units. We work precisely according to project documentation and pay attention to every detail — from preparation to final commissioning.',
+      'projects.heading': 'Projects we have been part of',
+      'projects.sub': 'Over the years, our teams have been involved in industrial projects carried out for established companies across Europe. Below are selected examples.',
+      'refs.heading': 'References',
+      'footer.tagline': 'Projekt Abroad s.r.o. — a reliable partner for industrial subcontracting across Europe since 2010.',
+      'footer.nav.heading': 'Navigation',
+      'footer.contact.heading': 'Contact',
+      'footer.sectors.heading': 'Sectors',
+      'footer.copyright': '© 2024 Projekt Abroad s.r.o. All rights reserved.',
+      'footer.privacy': 'Privacy Policy',
+      'footer.terms': 'Terms of Use',
+      'map.se': 'Sweden',
+      'map.be': 'Belgium',
+      'map.de': 'Germany',
+      'map.cz': 'Czechia',
+      'map.at': 'Austria',
+      'map.si': 'Slovenia',
+    },
+    de: {
+      'nav.about': 'Über uns',
+      'nav.refs': 'Referenzen',
+      'nav.contact': 'Kontakt',
+      'hero.subtitle': 'Industrieller Subunternehmer · Europa',
+      'hero.h1': 'Professionalität&nbsp;•&nbsp;Vertrauen',
+      'hero.h2': 'Zuverlässigkeit&nbsp;•&nbsp;Partnerschaft',
+      'hero.stat.years': 'Jahre Erfahrung',
+      'hero.stat.countries': 'Länder tätig',
+      'hero.stat.workers': 'Entsandte Mitarbeiter',
+      'hero.stat.projects': 'Projekte, an denen wir beteiligt waren',
+      'hero.text': 'Projekt Abroad ist ein zuverlässiger Partner für industrielle Subunternehmen in ganz Europa. Wir bieten Montage, Installation und Wartung von Technologieanlagen für führende Unternehmen in der Lebensmittel-, Chemie-, Energie- und Pharmaindustrie.',
+      'sector.food': 'Lebensmittel',
+      'sector.pharma': 'Pharmazie',
+      'sector.energy': 'Energie',
+      'sector.chem': 'Chemie',
+      'sector.power': 'Kraftwerke',
+      'sector.plumbing': 'Installationen',
+      'sector.bridges': 'Brücken',
+      'sector.cranes': 'Sonstiges',
+      'about.heading': 'Über uns',
+      'about.p1': 'Projekt Abroad s.r.o. konzentriert sich auf die Bereitstellung hochqualifizierter Arbeitskräfte für Industrieprojekte in ganz Europa. Unsere Stärke liegt in der langjährigen Zusammenarbeit mit bewährten Partnern in Belgien, Deutschland, Österreich, Slowenien, Schweden und anderen Ländern.',
+      'about.p2': 'Wir bieten vollständige Lösungen im Bereich der Montage technologischer Anlagen, Rohrleitungssysteme, Schweißarbeiten und bautechnischer Tätigkeiten. Unsere Mitarbeiter sind vollständig zertifiziert und werden regelmäßig nach europäischen Normen geschult.',
+      'about.p3': 'Wir legen großen Wert auf Sicherheit, Qualität und die Einhaltung von Terminen. Jedes Projekt gehen wir individuell und mit voller Professionalität an — vom ersten Kontakt bis zur erfolgreichen Übergabe.',
+      'about.btn.contact': 'Kontaktieren',
+      'about.quality.title': 'Geprüfte Qualität vor jedem Projekt',
+      'about.quality.text': 'Dank unserer Partnerschaft mit einer Schweißschule durchläuft jeder neue Mitarbeiter vor dem Projektstart eine praktische Prüfung. Wir verlassen uns nicht nur auf Zertifikate — wir überprüfen die Fähigkeiten mit eigenen Augen, damit das Ergebnis stets unserem Qualitätsstandard entspricht.',
+      'services.heading': 'Was wir anbieten',
+      'services.sub': 'Wir liefern Fachkräfte mit nachweisbarer Erfahrung und gültiger Zertifizierung. Jeder Mitarbeiter wird vor dem Einsatz auf dem Projekt persönlich geprüft.',
+      'services.pipe.title': 'Professionelle Rohrarbeiten',
+      'services.pipe.text': 'Ausgeführt von geschulten und erfahrenen Rohrmonteuren und Schlossern, die isometrische Zeichnungen und alle erforderlichen Unterlagen lesen können.',
+      'services.weld.title': 'Umfassende Schweißarbeiten',
+      'services.weld.text': 'Durchgeführt von qualifizierten Schweißern mit verschiedenen Methoden einschließlich Orbitalschweißen. Alles nach EN- und ISO-Normen — mit nachgewiesener Qualifikation.',
+      'services.assembly.title': 'Montagearbeiten',
+      'services.assembly.text': 'Komplette Montage von Industrieanlagen, Stahlkonstruktionen und technologischen Einheiten. Wir arbeiten präzise nach Projektdokumentation und achten auf jedes Detail — von der Vorbereitung bis zur Inbetriebnahme.',
+      'projects.heading': 'Projekte, an denen wir beteiligt waren',
+      'projects.sub': 'Im Laufe der Jahre waren unsere Teams an Industrieprojekten beteiligt, die für namhafte Unternehmen in ganz Europa durchgeführt wurden. Nachfolgend eine Auswahl davon.',
+      'refs.heading': 'Referenzen',
+      'footer.tagline': 'Projekt Abroad s.r.o. — zuverlässiger Partner für industrielle Subunternehmen in ganz Europa seit 2010.',
+      'footer.nav.heading': 'Navigation',
+      'footer.contact.heading': 'Kontakt',
+      'footer.sectors.heading': 'Sektoren',
+      'footer.copyright': '© 2024 Projekt Abroad s.r.o. Alle Rechte vorbehalten.',
+      'footer.privacy': 'Datenschutz',
+      'footer.terms': 'Nutzungsbedingungen',
+      'map.se': 'Schweden',
+      'map.be': 'Belgien',
+      'map.de': 'Deutschland',
+      'map.cz': 'Tschechien',
+      'map.at': 'Österreich',
+      'map.si': 'Slowenien',
+    },
+  };
+
+  function setLang(lang) {
+    const t = translations[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) el.innerHTML = t[key];
+    });
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('lang-active'));
+    const activeBtn = document.getElementById('lang-' + lang);
+    if (activeBtn) activeBtn.classList.add('lang-active');
+    document.documentElement.lang = lang;
+  }
+
+  // ── Carousel init ──
+  function initCarousel() {
+    const strip = document.getElementById('ref-strip');
+    const outer = document.getElementById('ref-outer');
+    if (!strip || !outer) return;
+    strip.classList.remove('ref-animated');
+    // Force reflow to restart animation
+    void strip.offsetWidth;
+    const overflow = strip.scrollWidth - outer.offsetWidth;
+    if (overflow > 0) {
+      strip.style.setProperty('--scroll-end', `-${overflow}px`);
+      strip.classList.add('ref-animated');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setLang('cs');
+    initCarousel();
+  });
+  window.addEventListener('resize', initCarousel);
+</script>
+
+</body>
+</html>
