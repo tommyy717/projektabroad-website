@@ -148,6 +148,99 @@
     /* ── Section ── */
     .section-light { background: #F5F5F3; color: #111111; }
     .section-light .sub-label { color: #555; }
+
+    /* ── Mobile lang (hidden on desktop) ── */
+    .mobile-lang-row { display: none; }
+    @media (max-width: 768px) {
+      .mobile-lang-row { display: flex !important; }
+    }
+
+    /* ── Hamburger ── */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: #D9D9D9;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Mobile nav dropdown ── */
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+      background: #111111;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 0 1.25rem;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      color: #D9D9D9;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .mobile-nav a:last-child { border-bottom: none; }
+
+    /* ══════════════════ MOBILE ══════════════════ */
+    @media (max-width: 768px) {
+      /* Nav */
+      .nav-desktop-links { display: none !important; }
+      .hamburger { display: flex !important; }
+
+      /* Hero */
+      .hero-grid { grid-template-columns: 1fr !important; gap: 2rem !important; padding: 3rem 1.25rem 3rem !important; }
+      .hero-map { display: none !important; }
+      .hero-stats { gap: 1rem 1.5rem !important; }
+      .hero-stat-num { font-size: 2rem !important; }
+
+      /* Sectors bar */
+      .sectors-bar { padding: 1.5rem 1.25rem !important; gap: 1rem !important; justify-content: center !important; }
+
+      /* About */
+      .about-grid { grid-template-columns: 1fr !important; gap: 2.5rem !important; padding: 3rem 1.25rem !important; }
+      .about-photos { grid-template-columns: 1fr 1fr !important; }
+      .about-photo { height: 220px !important; }
+
+      /* Services */
+      .services-section { padding: 3rem 1.25rem !important; }
+
+      /* Projects */
+      .projects-section { padding: 3rem 1.25rem !important; }
+      .projects-grid { grid-template-columns: 1fr !important; }
+
+      /* References */
+      .refs-section { padding: 2.5rem 0 !important; }
+      .ref-card-img { width: 280px !important; height: 200px !important; }
+
+      /* Footer */
+      .footer-inner { padding: 3rem 1.25rem 2rem !important; }
+      .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 2rem !important; }
+      .footer-brand { grid-column: 1 / -1 !important; }
+      .footer-bottom { flex-direction: column !important; align-items: flex-start !important; gap: 0.75rem !important; }
+    }
+
+    @media (max-width: 480px) {
+      .footer-grid { grid-template-columns: 1fr !important; }
+      .about-photos { grid-template-columns: 1fr !important; }
+      .about-photo { height: 200px !important; }
+    }
   </style>
 </head>
 <body>
@@ -158,7 +251,7 @@
     <a href="#" style="display:flex; align-items:center; text-decoration:none;">
       <img src="brand_assets/logo.png" alt="PA Logo" style="height:48px; width:auto;" />
     </a>
-    <div style="display:flex; align-items:center; gap:2.5rem;">
+    <div style="display:flex; align-items:center; gap:2.5rem;" class="nav-desktop-links">
       <a href="#o-nas" class="nav-link" data-i18n="nav.about">O nás</a>
       <a href="#referencie" class="nav-link" data-i18n="nav.refs">Reference</a>
       <a href="#kontakt" class="nav-link" data-i18n="nav.contact">Kontakt</a>
@@ -171,12 +264,31 @@
         <button class="lang-btn" id="lang-de" onclick="setLang('de')" aria-label="Deutsch">DE</button>
       </div>
     </div>
+    <!-- Mobile right: lang + hamburger -->
+    <div class="mobile-lang-row" style="align-items:center; gap:1rem;">
+      <div style="display:flex; align-items:center; gap:0;">
+        <button class="lang-btn lang-active" id="lang-cs-m" onclick="setLang('cs')" aria-label="Čeština">CZ</button>
+        <span class="lang-sep">|</span>
+        <button class="lang-btn" id="lang-en-m" onclick="setLang('en')" aria-label="English">EN</button>
+        <span class="lang-sep">|</span>
+        <button class="lang-btn" id="lang-de-m" onclick="setLang('de')" aria-label="Deutsch">DE</button>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMobileNav()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile nav -->
+  <div class="mobile-nav" id="mobile-nav">
+    <a href="#o-nas" data-i18n="nav.about" onclick="closeMobileNav()">O nás</a>
+    <a href="#referencie" data-i18n="nav.refs" onclick="closeMobileNav()">Reference</a>
+    <a href="#kontakt" data-i18n="nav.contact" onclick="closeMobileNav()">Kontakt</a>
   </div>
 </nav>
 
 <!-- ═══════════════════════════════════════ HERO ═══════════════════════════════════════ -->
-<section style="background: linear-gradient(160deg, #1C2122 0%, #111111 60%); padding:5rem 2rem 4rem;">
-  <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center;">
+<section style="background: linear-gradient(160deg, #1C2122 0%, #111111 60%);">
+  <div class="hero-grid" style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; padding:5rem 2rem 4rem;">
 
     <!-- Left: headline + stats -->
     <div>
@@ -190,21 +302,21 @@
       </h2>
 
       <!-- Stats grid -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem 2rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:2rem; margin-bottom:2.5rem;">
+      <div class="hero-stats" style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem 2rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:2rem; margin-bottom:2.5rem;">
         <div>
-          <div style="font-size:2.5rem; font-weight:900; color:#1FB6CF; line-height:1; letter-spacing:-0.03em;">5</div>
+          <div class="hero-stat-num" style="font-size:2.5rem; font-weight:900; color:#1FB6CF; line-height:1; letter-spacing:-0.03em;">5</div>
           <div style="font-size:0.7rem; color:#D9D9D9; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.3rem;" data-i18n="hero.stat.years">Let zkušeností</div>
         </div>
         <div>
-          <div style="font-size:2.5rem; font-weight:900; color:#1FB6CF; line-height:1; letter-spacing:-0.03em;">6+</div>
+          <div class="hero-stat-num" style="font-size:2.5rem; font-weight:900; color:#1FB6CF; line-height:1; letter-spacing:-0.03em;">6+</div>
           <div style="font-size:0.7rem; color:#D9D9D9; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.3rem;" data-i18n="hero.stat.countries">Zemí působení</div>
         </div>
         <div>
-          <div style="font-size:2.5rem; font-weight:900; color:#1FB6CF; line-height:1; letter-spacing:-0.03em;">170+</div>
+          <div class="hero-stat-num" style="font-size:2.5rem; font-weight:900; color:#1FB6CF; line-height:1; letter-spacing:-0.03em;">170+</div>
           <div style="font-size:0.7rem; color:#D9D9D9; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.3rem;" data-i18n="hero.stat.workers">Vyslaných pracovníků</div>
         </div>
         <div>
-          <div style="font-size:2.5rem; font-weight:900; color:#1FB6CF; line-height:1; letter-spacing:-0.03em;">78</div>
+          <div class="hero-stat-num" style="font-size:2.5rem; font-weight:900; color:#1FB6CF; line-height:1; letter-spacing:-0.03em;">78</div>
           <div style="font-size:0.7rem; color:#D9D9D9; text-transform:uppercase; letter-spacing:0.1em; margin-top:0.3rem;" data-i18n="hero.stat.projects">Projektů, na nichž jsme se podíleli</div>
         </div>
       </div>
@@ -215,7 +327,7 @@
     </div>
 
     <!-- Right: Europe SVG map -->
-    <div style="position:relative; display:flex; justify-content:center; align-items:center;">
+    <div class="hero-map" style="position:relative; display:flex; justify-content:center; align-items:center;">
       <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:500px; filter:drop-shadow(0 8px 32px rgba(31,182,207,0.15));">
         <rect width="320" height="280" fill="#1C2122" rx="4"/>
 
@@ -303,8 +415,8 @@
 </section>
 
 <!-- ══════════════════════════ INDUSTRY SECTORS ══════════════════════════ -->
-<div style="background:#111111; border-top:1px solid rgba(255,255,255,0.06); border-bottom:1px solid rgba(255,255,255,0.06); padding:2rem 2rem;">
-  <div style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-around; align-items:center; flex-wrap:wrap; gap:1.5rem;">
+<div style="background:#111111; border-top:1px solid rgba(255,255,255,0.06); border-bottom:1px solid rgba(255,255,255,0.06);">
+  <div class="sectors-bar" style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-around; align-items:center; flex-wrap:wrap; gap:1.5rem; padding:2rem;">
     <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
       <img src="brand_assets/1food_blue.svg" alt="Food" style="width:36px; height:36px;" />
       <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:#D9D9D9;" data-i18n="sector.food">Potravinářství</span>
@@ -341,8 +453,8 @@
 </div>
 
 <!-- ════════════════════════════ O NÁS ════════════════════════════ -->
-<section id="o-nas" class="section-light" style="padding:5rem 2rem;">
-  <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:start;">
+<section id="o-nas" class="section-light">
+  <div class="about-grid" style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:start; padding:5rem 2rem;">
 
     <div>
       <span class="cyan-line"></span>
@@ -373,12 +485,12 @@
       </div>
     </div>
 
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
-      <div style="position:relative; overflow:hidden; height:420px;">
+    <div class="about-photos" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+      <div class="about-photo" style="position:relative; overflow:hidden; height:420px;">
         <img src="website_pics/1img.jpg" alt="Svářeč při práci" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;" />
         <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.35), transparent);"></div>
       </div>
-      <div style="position:relative; overflow:hidden; height:420px;">
+      <div class="about-photo" style="position:relative; overflow:hidden; height:420px;">
         <img src="website_pics/2img.jpg" alt="Potrubní systém" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;" />
         <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.35), transparent);"></div>
       </div>
@@ -388,7 +500,7 @@
 </section>
 
 <!-- ════════════════════════════ CO NABÍZÍME ════════════════════════════ -->
-<section style="background:#111111; padding:5rem 2rem;">
+<section class="services-section" style="background:#111111; padding:5rem 2rem;">
   <div style="max-width:1200px; margin:0 auto;">
     <span class="cyan-line"></span>
     <h2 style="font-size:2.25rem; font-weight:900; letter-spacing:-0.03em; color:#F7FFFF; margin-bottom:0.75rem;" data-i18n="services.heading">Co nabízíme</h2>
@@ -428,13 +540,13 @@
 </section>
 
 <!-- ════════════════════════════ PROJEKTY ════════════════════════════ -->
-<section style="background:#F5F5F3; padding:5rem 2rem;">
+<section class="projects-section" style="background:#F5F5F3; padding:5rem 2rem;">
   <div style="max-width:1200px; margin:0 auto;">
     <span class="cyan-line"></span>
     <h2 style="font-size:2.25rem; font-weight:900; letter-spacing:-0.03em; color:#111111; margin-bottom:0.75rem;" data-i18n="projects.heading">Projekty, na kterých jsme se podíleli</h2>
     <p style="color:#555; font-size:0.9375rem; line-height:1.7; max-width:620px; margin-bottom:3rem;" data-i18n="projects.sub">V průběhu let byly naše týmy součástí průmyslových projektů realizovaných pro etablované společnosti napříč Evropou. Níže uvádíme vybrané z nich.</p>
 
-    <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:1.5rem;">
+    <div class="projects-grid" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:1.5rem;">
 
       <!-- Bosch -->
       <div style="position:relative; overflow:hidden; height:220px; cursor:default;" onmouseover="this.querySelector('img').style.transform='scale(1.05)'" onmouseout="this.querySelector('img').style.transform='scale(1)'">
@@ -481,7 +593,7 @@
 </section>
 
 <!-- ════════════════════════════ REFERENCE (carousel) ════════════════════════════ -->
-<section id="referencie" style="background:#111111; padding:4rem 0;">
+<section id="referencie" class="refs-section" style="background:#111111; padding:4rem 0;">
 
   <!-- Carousel outer (clips overflow) -->
   <div id="ref-outer">
@@ -569,13 +681,13 @@
 </section>
 
 <!-- ════════════════════════════ FOOTER ════════════════════════════ -->
-<footer id="kontakt" style="background:#0D0F10; border-top:2px solid #1FB6CF; padding:4rem 2rem 2rem;">
-  <div style="max-width:1200px; margin:0 auto;">
+<footer id="kontakt" style="background:#0D0F10; border-top:2px solid #1FB6CF;">
+  <div class="footer-inner" style="max-width:1200px; margin:0 auto; padding:4rem 2rem 2rem;">
 
-    <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:3rem; margin-bottom:3rem;">
+    <div class="footer-grid" style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:3rem; margin-bottom:3rem;">
 
       <!-- Brand col -->
-      <div>
+      <div class="footer-brand">
         <img src="brand_assets/logo.png" alt="PA Logo" style="height:60px; width:auto; margin-bottom:1.25rem;" />
         <p style="font-size:0.875rem; color:#D9D9D9; line-height:1.7; max-width:280px;">
           Projekt Abroad s.r.o.
@@ -627,7 +739,7 @@
     </div>
 
     <!-- Bottom bar -->
-    <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+    <div class="footer-bottom" style="border-top:1px solid rgba(255,255,255,0.08); padding-top:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
       <p style="font-size:0.75rem; color:#666;" data-i18n="footer.copyright">© 2024 Projekt Abroad s.r.o. Všechna práva vyhrazena.</p>
       <div style="display:flex; gap:1.5rem;">
         <a href="#" style="font-size:0.75rem; color:#666; text-decoration:none; transition:color 0.18s;" onmouseover="this.style.color='#1FB6CF'" onmouseout="this.style.color='#666'" data-i18n="footer.privacy">Ochrana osobních údajů</a>
@@ -831,6 +943,36 @@
     initCarousel();
   });
   window.addEventListener('resize', initCarousel);
+</script>
+
+<script>
+  function toggleMobileNav() {
+    const nav = document.getElementById('mobile-nav');
+    const btn = document.getElementById('hamburger');
+    nav.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+  function closeMobileNav() {
+    document.getElementById('mobile-nav').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+  }
+
+  // Keep mobile lang buttons in sync with desktop ones
+  const mobileLangBtns = {
+    'lang-cs-m': 'lang-cs',
+    'lang-en-m': 'lang-en',
+    'lang-de-m': 'lang-de',
+  };
+  // Patch setLang to also update mobile lang buttons
+  const _origSetLang = setLang;
+  window.setLang = function(lang) {
+    _origSetLang(lang);
+    // sync mobile active state
+    ['lang-cs-m','lang-en-m','lang-de-m'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) btn.classList.toggle('lang-active', id === 'lang-' + lang + '-m');
+    });
+  };
 </script>
 
 </body>
